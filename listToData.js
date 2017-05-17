@@ -1,7 +1,6 @@
 Object.prototype.toFormData = function () {
     var objToFormData = function (obj,obj2,sec) {
         if(obj){
-            var count = 0;
             for(var name in obj){
                 var val = obj[name];
                 if(val instanceof Array){
@@ -10,7 +9,7 @@ Object.prototype.toFormData = function () {
                             var val2 = item[name2];
                             if(val2 instanceof Array){
                                 val2.forEach(function (dItem,dIndex) {
-                                    objToFormData(dItem,obj,name+'['+index+'].'+name2);
+                                    objToFormData(dItem,obj,name+'['+index+'].'+name2+'['+dIndex+']');
                                 });
                             }else{
                                 if((typeof val2)!='function'){
@@ -22,8 +21,7 @@ Object.prototype.toFormData = function () {
                     delete obj[name];
                 }else if(sec){
                     if((typeof val)!='function'){
-                        obj2[sec+'['+count+'].'+name] = val;
-                        count++;
+                        obj2[sec+'.'+name] = val;
                     }
                 }
             }
@@ -32,7 +30,7 @@ Object.prototype.toFormData = function () {
     objToFormData(this);
     return this;
 }
-var cc = [{a:'1',b:'2'},{a:'3',b:'4'}];
+var cc = [{a:'aa',b:'bb'},{a:'aa1',b:'bb2'}];
 var lists = [{name:'1234',age:12},{name:'33',age:22,bb:cc}];
 var lake = {name:'hhl',age:20,ll:lists};
 console.info(lake.toFormData());
