@@ -1,14 +1,26 @@
-router.post('/users', koaBody({multipart:true}),function *(next) {
+router.post('/upload', koaBody({multipart:true}),function *(next) {
+    var $self = this;
     var file = this.request.body.files.file;
-    var r = request.post('http://localhost:8888/wopi/upload', function optionalCallback (err, httpResponse, body) {
-        if (err) {
-            return console.error('upload failed:', err);
+    var formData = {
+        file: {
+            value: fs.createReadStream(file.path),
+            options: {
+                filename: file.name,
+                contentType: file.mimeType
+            }
         }
-        console.log('Upload successful!  Server responded with:', body);
-    });
-    var form = r.form();
-    form.append('file', fs.createReadStream(file.path));
-    form.append('name', file.name);
+    };
+    var options = {
+        url: 'http://localhost:8888/wopi/upload',
+        method: 'POST',
+        formData: formData
+    }
+
+    yield (request(options).then(function () {
+        $self.body = 'nihao'
+    }));
+
+
 });
 
 
