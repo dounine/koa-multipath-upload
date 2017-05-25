@@ -1,26 +1,39 @@
 router.post('/upload', koaBody({multipart:true}),function *(next) {
     var $self = this;
-    var file = this.request.body.files.file;
-    var formData = {
-        file: {
-            value: fs.createReadStream(file.path),
+    var file = this.request.body.files.files;
+    var files = [];
+    if(file instanceof Array){
+        for(var i =0;i<file.length;i++){
+            var f = file[i];
+            var oo = {
+                value:fs.createReadStream(f.path),
+                options: {
+                    filename: f.name,
+                    contentType: f.mimeType
+                }
+            };
+            files.push(oo);
+        }
+    }else{
+        var oo = {
+            value:fs.createReadStream(file.path),
             options: {
                 filename: file.name,
                 contentType: file.mimeType
             }
-        }
-    };
+        };
+        files.push(oo);
+    }
     var options = {
         url: 'http://localhost:8888/wopi/upload',
         method: 'POST',
-        formData: formData
-    }
-
-    yield (request(options).then(function () {
-        $self.body = 'nihao'
+        formData: {
+            files: files
+        }
+    };
+    yield (request(options).then(function (body) {
+        $self.body = body;
     }));
-
-
 });
 
 
@@ -35,27 +48,19 @@ router.post('/upload', koaBody({multipart:true}),function *(next) {
 
 $scope.upload = function () {
         var fd = new FormData();
-        var file = document.getElementById('abc').files[0];
-        fd.append('file', file);
+        var file = document.getElementById('abc').files;
+        for(var i =0;i<file.length;i++){
+            var f= file[i];
+            fd.append('files',f);
+        }
         $http({
-
             method: 'POST',
-            url: '/users',
+            url: '/upload',
             headers: {
-
                 'Content-Type': undefined
-
             },
             data: fd,
-            transformRequest: function (data, headersGetter) {
-                var formData = new FormData();
-                angular.forEach(data, function (value, key) {
-                    formData.append(key, value);
-
-                });
-                return formData;
-
-            }
+            transformRequest: angular.identity
         },function (data) {
             console.info(data);
         });
