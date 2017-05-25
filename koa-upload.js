@@ -8,8 +8,7 @@ router.post('/upload', koaBody({multipart:true}),function *(next) {
             var oo = {
                 value:fs.createReadStream(f.path),
                 options: {
-                    filename: f.name,
-                    contentType: f.mimeType
+                    filename: f.name
                 }
             };
             files.push(oo);
@@ -18,8 +17,7 @@ router.post('/upload', koaBody({multipart:true}),function *(next) {
         var oo = {
             value:fs.createReadStream(file.path),
             options: {
-                filename: file.name,
-                contentType: file.mimeType
+                filename: file.name
             }
         };
         files.push(oo);
